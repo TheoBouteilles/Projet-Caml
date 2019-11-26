@@ -1,3 +1,1 @@
-let x ="hello world";;
-
-let y="hello";;
+let aircraft = "aricraft";;
