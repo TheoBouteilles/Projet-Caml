@@ -1,1 +1,1 @@
-let x ="hello world";;
+class aircraft = object
