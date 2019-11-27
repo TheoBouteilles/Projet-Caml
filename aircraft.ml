@@ -1,6 +1,4 @@
-type aircraft = { id : int; mutable pos : float*float ; mutable vit : float*float ; mutable
-voisins : aircraft list}
-let id_ref = ref 0;;
+type aircraft = {id : int; mutable pos : float*float; mutable speed_vector: float*float; mutable neigbors_list: aircraft list; route: (float*float) list};;
 
 let creer_avion position vitesse =
 	incr id_ref;
