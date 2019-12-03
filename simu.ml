@@ -13,5 +13,10 @@ let rec ending a_list =
     [] -> true
   | tete:queue -> (Aircraft.arrived tete) && (ending queue);;
 
-let simu a_list dt ending =
-  while !(ending a_list) do update_pos a_list dt done;;
+let simu a_list dt file =
+  while !(ending a_list) do begin
+    write file a_list;
+    update_pos a_list dt
+      end
+      done;;
+
