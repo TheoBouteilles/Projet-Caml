@@ -63,6 +63,19 @@ let getDistHeadingMatrix = fun a1 a2 ->
         let h2 = (float j) *. 10. in
         matrix.(i).(j) <- getDistWithHeading a1 a2 h1 h2
       end
-    done
-  done
+    done;
+  done;
+  matrix
+;;
+
+
+let getConflictMatrix = fun a1 a2 ->
+  let matrix = Array.make_matrix 36 36 true in
+  let matrix' = getDistHeadingMatrix a1 a2 in
+  for i=0 to 35 do
+    for j=0 to 35 do
+      matrix.(i).(j) <- matrix'.(i).(j) < 10000. (* meters *)
+    done;
+  done;
+  matrix
 ;;
