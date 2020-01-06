@@ -1,4 +1,5 @@
 val pi : float
 val degrees : float -> float
 val radians : float -> float
-val allmax : ('a -> 'b) -> 'a array -> int array
+type 'a intervalle = Empty | Intervalle of 'a * 'a
+val intersection : 'a intervalle -> 'a intervalle -> 'a intervalle

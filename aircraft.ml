@@ -2,19 +2,26 @@ type aircraft = {id : int;
                  mutable pos : Vector2D.vector2D;
                  mutable heading: float;
                  mutable speed: float;
-                 mutable neighbors: aircraft list;
-                 route: Vector2D.vector2D array;
-                 mutable activeWaypoint: int}
-                
+                 destination : Vector2D.vector2D}
 
-let createAircraft = fun id position heading speed route ->
+let _n = 27
+
+let _angleMax = 40. (* degrees *)
+
+let _separationLimite = 9260. (* meters *)
+
+let _conflictDetectionTime = 300. (* seconds *)
+
+let _detectionRadius = 166680. (* meters = 90NM *)
+
+
+let createAircraft = fun id position heading speed destination ->
   {id = id;
    pos = position;
    heading=heading;
    speed=speed;
-   neighbors = [];
-   route=route;
-   activeWaypoint= 0}
+   destination = destination
+  }
 
 
 let setSpeed = fun a speed ->
@@ -23,7 +30,7 @@ let setSpeed = fun a speed ->
 
 let setHeading = fun heading aircraft ->
   aircraft.heading <- heading
-    
+
 
 let getHeadingVector = fun aircraft ->
   let radh = Math.radians aircraft.heading in
@@ -45,16 +52,15 @@ let moveAircraft = fun dt aircraft ->
   aircraft.pos <- Vector2D.add pos (Vector2D.mul v dt)
       
 
-let rec discoverNeighbors = fun distance a1 aircrafts_list ->
-  let neighbors =[] in
+let rec discoverNeighbors = fun a1 aircrafts_list ->
   match aircrafts_list with
-  |[]-> neighbors
-  |t::q -> if t.id != a1.id && getDistanceAircrafts a1 t < distance
-    then t::(discoverNeighbors distance a1 q)
-    else discoverNeighbors distance a1 q
+  |[]-> []
+  |a::q -> if a.id != a1.id && getDistanceAircrafts a1 a < _detectionRadius
+    then a::(discoverNeighbors a1 q)
+    else discoverNeighbors a1 q
 
 
-let getMinimalSeparationDistanceForHeading = fun a1 a2 h1 h2 ->
+let getMinimalSeparationDistance = fun a1 a2 h1 h2 ->
   let p1 = a1.pos in
   let p2 = a2.pos in
   let v1 = Vector2D.mul
@@ -72,7 +78,7 @@ let getMinimalSeparationDistanceForHeading = fun a1 a2 h1 h2 ->
     if t < 0. then
       (* cas où les avions s'éloignent *)
       getDistanceAircrafts a1 a2 
-    else if t <= 180. then
+    else if t <= _conflictDetectionTime then
       (* cas où le croisement va se faire dans les 3 min *)
       Vector2D.norm (Vector2D.add p (Vector2D.mul v t))
     else
@@ -80,83 +86,50 @@ let getMinimalSeparationDistanceForHeading = fun a1 a2 h1 h2 ->
       Vector2D.norm (Vector2D.add p (Vector2D.mul v 180.))  
 
 
-let getMinimalSeparationDistanceMatrix = fun a1 a2 headings ->
-  let n = Array.length headings in
-  let matrix = Array.make_matrix n n 0. in
-  for i=0 to (n-1) do
-    for j=0 to (n-1) do
+let getHeadings = fun a ->
+  let h = a.heading in
+  let eps = 2. *. _angleMax /. (float (_n-1)) in
+  Array.init _n (fun i -> h -. _angleMax +. (float i) *. eps)
+
+
+let getConflictMatrix = fun a1 a2 ->
+  let hs1 = getHeadings a1 in
+  let hs2 = getHeadings a2 in
+  let matrix = Array.make_matrix _n _n true in
+  for i=0 to (_n-1) do
+    for j=0 to (_n-1) do
       begin
-        let h1 = headings.(i) in
-        let h2 = headings.(j) in
-        matrix.(i).(j) <- getMinimalSeparationDistanceForHeading a1 a2 h1 h2
+        let h1 = hs1.(i) in
+        let h2 = hs2.(j) in
+        matrix.(i).(j) <- (getMinimalSeparationDistance a1 a2 h1 h2) >= _separationLimite
       end
     done;
   done;
   matrix
-  
-
-let getConflictMatrix = fun a1 a2 headings ->
-  let n = Array.length headings in
-  let matrix = Array.make_matrix n n true in
-  let matrix' = getMinimalSeparationDistanceMatrix a1 a2 headings in
-  for i=0 to (n-1) do
-    for j=0 to (n-1) do
-      matrix.(i).(j) <- matrix'.(i).(j) < 10000. (* meters *)
-    done;
-  done;
-  matrix
 
 
-let isPrioOn = fun a1 a2 -> a1.id > a2.id
+let cmp = fun a1 a2 ->
+  compare a1.pos a2.pos
 
 
-let getAvailableHeadings = fun a1 a2 headings ->
-  let matrix = getConflictMatrix a1 a2 headings in
-  if isPrioOn a1 a2 then headings
-  else
-    let f = fun b sum -> if b then 1+sum else sum in
-    Math.allmax (fun a -> Array.fold_right f a 0) matrix
+exception NoSolution
 
+let getAvailableHeadings = fun a env->
+  let getAvailableIndexes = fun a1 a2 ->
+      let matrix = getConflictMatrix a1 a2 in
+      let list = Rectangle.listRectangles _n _n matrix in
+      let mbr = Rectangle.getMostBalancedRectangle list in
+      match mbr with
+      |None -> raise NoSolution
+      |Some (j,i,width,height) ->
+        Math.Intervalle(i, i+height), Math.Intervalle(j, j+width)
+  in
 
-let getAvailableHeadings2 = fun a headings ->
-  List.fold_right (fun a2 hs-> getAvailableHeadings a a2 hs) a.neighbors headings
+  let neighbors = discoverNeighbors a env in
 
-
-module AircraftModel = struct
-  type state = Vector2D.vector2D * float
-  type user_param = aircraft
-
-  let initial_state = fun (a:user_param) -> (a.pos , a.heading) 
-                                            
-  let is_goal = fun (a:user_param) u -> (u == a.route.(a.activeWaypoint))
-                                        
-  let k = fun _ u v ->
-    let (p,_),(p',_) = u,v in
-    Vector2D.dist p p'
-
-  let h = fun (a:user_param) u ->
-    let (p,_) = u in
-    Vector2D.dist p a.route.(a.activeWaypoint)
-      
-  let next = fun (a:user_param) u ->
-    if u == initial_state a then
-      let hs = getAvailableHeadings2 a headings in
-      
-      let f = fun h l ->
-        let p = Vector2D.add
-            a.pos
-            (Vector2D.mul
-               (cos (Math.radians h), sin (Math.radians h))
-               (a.speed*. dt))
-        in
-        (p,h)::l
-      in
-
-      Array.fold_right f hs []
-    else
-      let (p,h) = u in
-      [truc; goal]
-
-  let do_at_insertion _ _ _ = ()
-  let do_at_extraction _ _ _ _ = ()
-end
+  let intervalles = (List.map (fun a' -> if cmp a a' < 0 then
+                                let _,is = getAvailableIndexes a' a in is
+                              else let is,_ = getAvailableIndexes a a' in is)
+                      neighbors)
+  in
+  List.fold_right Math.intersection intervalles (Math.Intervalle(0, _n))

@@ -9,22 +9,13 @@ let radians = fun deg ->
   deg *. pi /. 180.
 
 
-let allmax = fun f array ->
-  let n = Array.length array in
-  if n == 0 then
-    [||]
-  else
-    begin
-      let l = ref [0] in
-      let max = ref (f array.(0)) in
-      for i=0 to (n-1) do
-        if f array.(i) > !max then
-          begin
-            l:= [i];
-            max := f array.(i)
-          end
-        else if f array.(i) == !max then
-          l := i::!l
-      done;
-      Array.of_list !l
-    end
+type 'a intervalle = Empty | Intervalle of 'a*'a
+
+
+let intersection = fun intervalle1 intervalle2 ->
+  match intervalle1, intervalle2 with
+  | _,Empty -> Empty
+  | Empty,_ -> Empty
+  | Intervalle(i,j), Intervalle(i',j') -> if max i i' < min j j' then
+      Intervalle (max i i', min j j')
+    else Empty
