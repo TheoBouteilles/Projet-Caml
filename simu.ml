@@ -1,4 +1,3 @@
-
 let rec update_pos a_list dt table =
   match a_list with
     [] -> []
