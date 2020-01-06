@@ -3,6 +3,9 @@
 # User variables
 
 # Generic
+%.mli: %.ml
+	ocamlc -i $< > $@
+
 %.cmi: %.mli
 	ocamlc $<
 
