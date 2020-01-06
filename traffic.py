@@ -98,7 +98,7 @@ def xys_to_points(str_xy_list):
     """ xys_to_points(str list) returns Point tuple: converts x,y str list to Point tuple"""
 
     def xy_to_point(str_xy):
-        x, y, z = map(int, str_xy.split(','))
+        x, y, z = map(float, str_xy.split(','))
         return Point(x, y)
 
     return tuple(xy_to_point(str_xy) for str_xy in str_xy_list)
@@ -106,7 +106,7 @@ def xys_to_points(str_xy_list):
 def xys_to_heading(str_xy_list):
 
     def xy_to_heading(str_xy):
-        x, y, z = map(int, str_xy.split(','))
+        x, y, z = map(float, str_xy.split(','))
         return z
 
     return tuple(xy_to_heading(str_xy) for str_xy in str_xy_list)
