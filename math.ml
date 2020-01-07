@@ -8,6 +8,9 @@ let degrees = fun rad ->
 let radians = fun deg ->
   deg *. pi /. 180.
 
+let normalize = fun deg ->
+  let n = floor (deg /. 360.) in
+  deg -. 360. *. n
 
 type 'a intervalle = Empty | Intervalle of 'a*'a
 

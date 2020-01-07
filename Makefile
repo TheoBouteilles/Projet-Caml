@@ -1,10 +1,19 @@
 # Makefile
 
 # User variables
+SOURCES = math.ml vector2D.ml rectangle.ml aircraft.ml simu.ml
+TARGET = main
+OCAMLC = ocamlc -g
+DEP = ocamldep
+OBJS = $(SOURCES:.ml=.cmo)
 
 # Generic
-%.mli: %.ml
-	ocamlc -i $< > $@
+all : .depend byte
+
+byte: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(OCAMLC) -o $@ $^
 
 %.cmi: %.mli
 	ocamlc $<
@@ -12,10 +21,10 @@
 %.cmo: %.ml
 	ocamlc -c $<
 
-#.PHONY: clean
+.PHONY: clean
 
-#clean:
-#	rm -f *.cm[io] *~
+clean:
+	rm -f *.cm[io] *~
 
 .depend: $(SOURCES)
 	ocamldep *.mli *.ml > .depend

@@ -133,3 +133,34 @@ let getAvailableHeadings = fun a env->
                       neighbors)
   in
   List.fold_right Math.intersection intervalles (Math.Intervalle(0, _n))
+
+
+let getNextHeading = fun a env ->
+  match getAvailableHeadings a env with
+  | Math.Empty -> raise NoSolution
+  | Math.Intervalle(i,j) ->
+    let eps = 2. *. _angleMax /. (float (_n-1)) in
+    let h = a.heading in
+    let h1 = Math.normalize (h -. _angleMax +. (float i) *. eps) in
+    let h2 = Math.normalize (h -. _angleMax +. (float j) *. eps) in
+    let goalh = Math.degrees (Vector2D.vect_angle (Vector2D.sub a.destination a.pos)) in
+    if Math.normalize ( goalh -. h1) <= Math.normalize (h2 -. h1) then goalh
+    else if Math.normalize(goalh -. h1) <= Math.normalize (goalh -. h2) then h1
+    else h2
+    
+
+let rec updateEnv env dt table =
+  match env with
+    [] -> ()
+  | tete::queue -> begin
+      setHeading (getNextHeading tete env) tete;
+      let x,y = tete.pos in
+      let a=Printf.sprintf "%.3f,%.3f,%.3f" x y tete.heading in
+      table.(tete.id) <- a::table.(tete.id);
+      moveAircraft dt tete;
+      updateEnv queue dt table
+    end;;
+
+
+let arrived a dt =
+  (Vector2D.dist a.pos a.destination) < (a.speed *. dt)

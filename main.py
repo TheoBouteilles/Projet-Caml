@@ -4,7 +4,7 @@ from PyQt5 import QtWidgets
 import traffic
 import radarview
 
-PLN_FILE = ("DATA/flights.txt","DATA/lfpg_flights.txt", "DATA/lfpo_flights.txt")
+PLN_FILE = ("result.txt","DATA/lfpg_flights.txt", "DATA/lfpo_flights.txt")
 
 if __name__ == "__main__":
     choice = 0

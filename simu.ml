@@ -1,53 +1,44 @@
-let rec update_pos a_list dt table =
-  match a_list with
-    [] -> []
-  | tete:queue -> begin
-      let x,y = tete.pos in
-      let a=Printf.sprintf "%.3f,%.3f,%.3f" x y tete.heading in
-      table.(tete.id) <- table.(tete.id)::a
-      Aircraft.move tete;
-      update_pos queue dt table
-    end;;
-
-let rec ending a_list =
+let rec ending a_list dt =
   match a_list with
     [] -> true
-  | tete:queue -> (Aircraft.arrived tete) && (ending queue);;
+  | tete::queue -> (Aircraft.arrived tete dt) && (ending queue dt);;
 
 let write filename table =
   begin
     let file = open_out filename in
-    for i = 0 to Array.length table do
+    for i = 0 to (Array.length table -1) do
       begin
         Printf.fprintf file "%d" i;
-        Printf.fprintf file "0";
+        Printf.fprintf file " 0";
         let rec write_line line=
-          match l with
-            [] -> []
-          | tete:queue -> begin
+          match line with
+            [] -> ()
+          | tete::queue -> begin
               Printf.fprintf file " %s" tete;
               write_line queue;
             end
         in write_line table.(i);
-        Printf.fprintf "\n";
+        Printf.fprintf file "\n";
       end
-   done
-      close_out file;
-  end;;
-
-let simu a_list dt filename =
-  let naircrafts = List.length a_list in
-  let table = Array.make naircrafts [] in
-  begin
-    while !(ending a_list) do
-      begin
-(*        Aircraft.algo a_list;*)
-        update_pos a_list dt table;
-      end;
     done;
-    for i=0 to Array.length table do List.rev table.(i) done;
-    write filename table;
+    close_out file;
   end;;
 
-aircrafts = [(Aircraft.create_aircraft 0 0,0 0. 100. 0,1000)]
-simu aircrafts 10 "results.txt";;
+let simu env dt filename n =
+  let table = Array.make n [] in
+  begin
+    while not (ending env dt) do
+        Aircraft.updateEnv env dt table;
+    done;
+  for i=0 to (Array.length table - 1) do
+    table.(i) <- List.rev table.(i)
+  done;
+  write filename table;
+  end;;
+
+
+let () =
+  let a1 = Aircraft.createAircraft 0 (-100000.,-100000.) 45. 300. (100000.,100000.) in
+  (*let a2 =  Aircraft.createAircraft 1 (100000.,-100000.) 135. 300. (-100000.,100000.) in*)
+  let env = [a1] in
+  simu env 60. "result.txt" 1;;
