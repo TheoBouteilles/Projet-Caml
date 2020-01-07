@@ -11,7 +11,6 @@ parser.cmx :
 rectangle.cmo : rectangle.cmi
 rectangle.cmx : rectangle.cmi
 rectangle.cmi :
-simu..cmi : aircraft.cmi
 simu.cmo : aircraft.cmi simu.cmi
 simu.cmx : aircraft.cmx simu.cmi
 simu.cmi : aircraft.cmi

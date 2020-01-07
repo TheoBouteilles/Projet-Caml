@@ -39,6 +39,6 @@ let simu env dt filename n =
 
 let () =
   let a1 = Aircraft.createAircraft 0 (-100000.,-100000.) 45. 300. (100000.,100000.) in
-  (*let a2 =  Aircraft.createAircraft 1 (100000.,-100000.) 135. 300. (-100000.,100000.) in*)
-  let env = [a1] in
-  simu env 60. "result.txt" 1;;
+  let a2 =  Aircraft.createAircraft 1 (100000.,-100000.) 135. 300. (-100000.,100000.) in
+  let env = [a1; a2] in
+  simu env 60. "result.txt" 2;;
