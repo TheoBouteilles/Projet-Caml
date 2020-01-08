@@ -83,26 +83,19 @@ let getMostBalancedRectangle = fun (list:rectangle list) ->
       match list with
       | [] -> Some mbr
       | rect::l' ->
-        let _,_,w,h = rect in
-        let _,_,wMBR,hMBR = mbr in
-        if min w h > min wMBR hMBR then
+        let x,y,w,h = rect in
+        let xMBR,yMBR,wMBR,hMBR = mbr in
+        if (x*x + y*y) < (xMBR*xMBR + yMBR*yMBR) then
           loop rect l'
-        else if min w h == min wMBR hMBR then
-          if max w h > max wMBR hMBR then
+        else if (x*x + y*y) == (xMBR*xMBR + yMBR*yMBR) then
+          if min w h > min wMBR hMBR then
             loop rect l'
+          else if min w h == min wMBR hMBR then
+            if max w h > max wMBR hMBR then
+              loop rect l'
+            else loop mbr l'
           else loop mbr l'
         else loop mbr l'
     in
     loop (0,0,0,0) list
 ;;
-
-
-let intersection = fun (rect:rectangle) (rect':rectangle) : rectangle option ->
-  let j,i,w,h = rect in
-  let j',i',w',h' = rect' in
-  let newj = max j j' in
-  let newi = max i i' in
-  let neww = max 0 ((min (j + w) (j' + w')) - newj) in
-  let newh = max 0 ((min (i + h) (i' + h')) - newi) in
-  if neww == 0 || newh == 0 then None
-  else Some (newj, newi, neww, newh)

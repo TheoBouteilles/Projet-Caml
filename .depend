@@ -1,11 +1,18 @@
-aircraft.cmo : vector2D.cmi math.cmi aircraft.cmi
-aircraft.cmx : vector2D.cmx math.cmx aircraft.cmi
-aircraft.cmi : math.cmi
+aircraft.cmo : vector2D.cmi rectangle.cmi math.cmi aircraft.cmi
+aircraft.cmx : vector2D.cmx rectangle.cmx math.cmx aircraft.cmi
+aircraft.cmi : vector2D.cmi math.cmi
 math.cmo : math.cmi
 math.cmx : math.cmi
 math.cmi :
-simu.cmo :
-simu.cmx :
+parser.cmo : parser.cmi
+parser.cmx : parser.cmi
+parser.cmi :
+rectangle.cmo : rectangle.cmi
+rectangle.cmx : rectangle.cmi
+rectangle.cmi :
+simu.cmo : vector2D.cmi parser.cmi math.cmi aircraft.cmi simu.cmi
+simu.cmx : vector2D.cmx parser.cmx math.cmx aircraft.cmx simu.cmi
+simu.cmi : aircraft.cmi
 vector2D.cmo : vector2D.cmi
 vector2D.cmx : vector2D.cmi
 vector2D.cmi :
