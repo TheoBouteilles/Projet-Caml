@@ -10,7 +10,7 @@ val _angleMax : float
 val _separationLimite : float
 val _conflictDetectionTime : float
 val _detectionRadius : float
-val createAircraft :
+val create :
   int -> Vector2D.vector2D -> float -> float -> Vector2D.vector2D -> aircraft
 val setSpeed : aircraft -> float -> unit
 val setHeading : float -> aircraft -> unit
@@ -27,5 +27,6 @@ val cmp : aircraft -> aircraft -> int
 exception NoSolution
 val getAvailableHeadings : aircraft -> aircraft list -> int Math.intervalle
 val getNextHeading : aircraft -> aircraft list -> float
-val updateEnv : aircraft list -> float -> string list array -> unit
+val updateEnv : aircraft list -> float -> unit
 val arrived : aircraft -> float -> bool
+val string_state : aircraft -> string

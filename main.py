@@ -1,14 +1,13 @@
 """Main module for the Python Airport code"""
+import sys
 
 from PyQt5 import QtWidgets
 import traffic
 import radarview
 
-PLN_FILE = ("result.txt","DATA/lfpg_flights.txt", "DATA/lfpo_flights.txt")
 
 if __name__ == "__main__":
-    choice = 0
-    flights = traffic.from_file(PLN_FILE[choice])
+    flights = traffic.from_file(sys.argv[1])
 
     # create the simulation
     sim = traffic.Simulation(flights)

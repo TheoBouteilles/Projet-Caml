@@ -3,7 +3,7 @@ import traffic
 
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtGui import QPen, QBrush, QColor, QPixmap
-from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtCore import Qt, QSize, QRectF
 from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsPixmapItem
 
 
@@ -27,6 +27,8 @@ class PanZoomView(QtWidgets.QGraphicsView):
         self.setRenderHint(QtGui.QPainter.Antialiasing)
         # enable drag and drop of the view
         self.setDragMode(self.ScrollHandDrag)
+
+        self.setSceneRect(QRectF(-150000,-150000,300000,300000))
 
     def wheelEvent(self, event):
         """Overrides method in QGraphicsView in order to zoom it when mouse scroll occurs"""
@@ -78,7 +80,7 @@ class RadarView(QtWidgets.QWidget):
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.advance)
 
-        self.view.scale(0.1,0.1)
+        self.fit_scene_in_view()
 
         # show the window
         self.show()
@@ -190,7 +192,6 @@ class AircraftItemsMotionManager:
         
 class AircraftItem(QGraphicsPixmapItem):
     """The view of an aircraft in the GraphicsScene"""
-
     def __init__(self, simu, f):
         """AircraftItem constructor, creates the ellipse and adds to the scene"""
         super().__init__(None)
@@ -200,7 +201,9 @@ class AircraftItem(QGraphicsPixmapItem):
         self.flight = f
         self.simulation = simu
         # build the ellipse;
-        self.setPixmap(QPixmap("DATA/airplane.png").scaled(QSize(250,250)))
+        self.setPixmap(QPixmap("DATA/airplane.png"))
+        self.setOffset(-self.boundingRect().width()/2, -self.boundingRect().height()/2)
+        self.setScale(10)
         # add tooltip
         tooltip = f.call_sign
         self.setToolTip(tooltip)
@@ -214,4 +217,3 @@ class AircraftItem(QGraphicsPixmapItem):
         self.setPos(position.x, position.y)
         heading = self.flight.get_heading(self.simulation.t)
         self.setRotation(heading)
-        

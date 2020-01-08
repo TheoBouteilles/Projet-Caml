@@ -1,7 +1,7 @@
 
 import enum
 
-STEP = 500  # Time step (seconds)
+STEP = 60  # Time step (seconds)
 RWY_SEP = 90  # Runway area width
 
 SHORTCUTS = """Shortcuts:

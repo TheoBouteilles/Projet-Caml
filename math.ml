@@ -19,6 +19,6 @@ let intersection = fun intervalle1 intervalle2 ->
   match intervalle1, intervalle2 with
   | _,Empty -> Empty
   | Empty,_ -> Empty
-  | Intervalle(i,j), Intervalle(i',j') -> if max i i' < min j j' then
+  | Intervalle(i,j), Intervalle(i',j') -> if max i i' <= min j j' then
       Intervalle (max i i', min j j')
     else Empty

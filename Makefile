@@ -1,7 +1,7 @@
 # Makefile
 
 # User variables
-SOURCES = math.ml vector2D.ml rectangle.ml aircraft.ml simu.ml
+SOURCES = math.ml vector2D.ml rectangle.ml parser.ml aircraft.ml simu.ml
 TARGET = main
 OCAMLC = ocamlc -g
 DEP = ocamldep
