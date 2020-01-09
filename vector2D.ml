@@ -20,7 +20,7 @@ let sub: vector2D -> vector2D -> vector2D = fun v v' ->
 
 let isZero: vector2D -> bool = fun v ->
   let (vx, vy) = v in
-  (vx < 1e-6) && (vy < 1e-6)
+  (abs_float vx < 1e-6) && (abs_float vy < 1e-6)
 
 
 let prod_scal: vector2D -> vector2D -> float = fun v v' ->

@@ -1,0 +1,2 @@
+id=0 start=(100000.,0.) heading=180. speed=250. goal=(-100000.,0.)
+id=1 start=(130000.,0.) heading=180. speed=300. goal=(-130000.,0.)
