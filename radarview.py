@@ -200,7 +200,7 @@ class AircraftItem(QGraphicsPixmapItem):
         # instance variables
         self.flight = f
         self.simulation = simu
-        # build the ellipse;
+        #build the Pixmap
         self.setPixmap(QPixmap("DATA/airplane.png"))
         self.setOffset(-self.boundingRect().width()/2, -self.boundingRect().height()/2)
         self.setScale(10)

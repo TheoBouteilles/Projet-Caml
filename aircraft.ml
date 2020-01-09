@@ -4,6 +4,8 @@ type aircraft = {id : int;
                  mutable speed: float;
                  destination : Vector2D.vector2D}
 
+type environment = aircraft list
+
 let _n = 50
 
 let _angleMax = 40. (* degrees *)
@@ -208,7 +210,7 @@ let rec updateEnv env dt =
   List.iter2 (fun a h -> updateAircraft a h dt) env hs
 
 
-let arrived a dt =
+let arrived a =
   (Vector2D.isZero (Vector2D.sub a.destination a.pos))
 
 let string_state a =
