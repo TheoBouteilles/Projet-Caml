@@ -1,7 +1,7 @@
-let rec ending a_list dt =
-  match a_list with
+let rec ending env dt =
+  match env with
     [] -> true
-  | tete::queue -> (Aircraft.arrived tete dt) && (ending queue dt);;
+  | tete::queue -> (Aircraft.arrived tete) && (ending queue dt);;
 
 let write filename table =
   begin
